@@ -1,0 +1,40 @@
+- name: install mysql server
+  ansible.builtin.dnf:
+    name: mysql-server
+    state: latest
+
+- name: Start and Enable Mysql Server
+  ansible.builtin.service:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: install python dependenices 
+  ansible.builtin.pip:
+    name:  
+    - PyMySQL
+    - cryptography
+    executable: pip3.9 # If python pip3.11 version then its 3.11
+
+#check password is already setup or not
+- name: check DB connections
+  community.mysql.mysql_info:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_host: "{{ login_host }}"
+    filter: version                 # to check wheather it's working or not withour error 
+  ignore_errors: yes
+  register: mysql_connection_output
+
+- name: print ouput 
+  ansible.builtin.debug:
+    msg: "Print output {{ mysql_connection_output }}"
+
+- name: setup root password
+  ansible.builtin.command: "mysql_secure_installation --set-root-pass {{ mysql_root_password }}"
+  when: mysql_connection_output.failed is true # 
+  
+  # In when condition we should not use {{}} braces 
+  # If the root password is not setup initally in DB connection command. 
+  # Then we should setup root password and use when condition saying the DB connection is failed and please setup root password.
+  # If Password is already setup then it will skip the root password setup

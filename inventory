@@ -1,0 +1,11 @@
+[db]
+db.akshaydaws-78s.online
+
+[backend]
+backend.akshaydaws-78s.online
+
+[frontend]
+akshaydaws-78s.online
+
+[all:vars]
+ansible_password=DevOps321
